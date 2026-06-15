@@ -1,0 +1,72 @@
+routing system: control with appear in each link
+                about page show the About part 
+                Home page show the Home part and so on
+
+
+# Express Server Documentation
+
+## Overview
+
+A simple Express server that:
+
+* Serves static files from the `views` directory
+* Logs every incoming request
+* Provides basic routes for home, about, and products
+
+## Installation
+
+```bash
+npm install express
+```
+
+## Run the Server
+
+```bash
+node server.js
+```
+
+Server URL:
+
+```text
+http://localhost:3001
+```
+
+## Available Routes
+
+| Method | Endpoint  | Description           |
+| ------ | --------- | --------------------- |
+| GET    | /         | Returns welcome text  |
+| GET    | /about    | Returns about message |
+| GET    | /products | Returns products list |
+
+## Static Files
+
+All files inside the `views` folder are publicly accessible.
+
+Example:
+
+```text
+views/index.html → /index.html
+views/style.css → /style.css
+```
+
+## Middleware
+
+### Static Middleware
+
+```js
+app.use(express.static("./views"));
+```
+
+Serves static assets.
+
+### Logger Middleware
+
+```js
+app.use((req, res, next) => {
+  console.log("Method:", req.method, "URL:", req.url);
+  next();
+});
+```
+
+Logs request method and URL for every incoming request.
