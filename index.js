@@ -1,11 +1,11 @@
+require("dotenv").config();
 const express = require("express");
 
 const app = express();
 
 const mongoose = require("mongoose");
 
-const url =
-  "mongodb+srv://amiraalzaian247_db_user:V0P01yY2bpJDRW8K@learn-nodejs.bj16x4o.mongodb.net/learn_nodejs?appName=learn-nodejs";
+const url = process.env.MONGO_URL;
 mongoose
   .connect(url)
   .then(() => {
@@ -20,6 +20,6 @@ app.use(express.json());
 const coursesRouter = require("./routes/courses.route");
 app.use("/api/courses", coursesRouter);
 
-app.listen(5000, () => {
+app.listen(process.env.PORT, () => {
   console.log("listening on port 5000");
 });
