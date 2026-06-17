@@ -1,7 +1,7 @@
 const { body } = require("express-validator");
 const express = require("express");
-const router = express.router();
-const coursesController = require("./controllers/courses.controller");
+const router = express.Router();
+const coursesController = require("../controllers/courses.controller");
 const validationSchema = require("../middlewares/validationSchema");
 router
   .route("/")
@@ -11,7 +11,7 @@ router
 router
   .route("/:courseId")
   .get(coursesController.getCourse)
-  .patch("/:courseId", coursesController.updateCourse)
-  .delete("/:courseId", coursesController.deleteCourse);
+  .patch(coursesController.updateCourse)
+  .delete(coursesController.deleteCourse);
 
 module.exports = router;
