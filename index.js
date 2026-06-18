@@ -1,9 +1,10 @@
 require("dotenv").config();
 const express = require("express");
-
+const cors = require("cors");
 const app = express();
 
 const mongoose = require("mongoose");
+const httpStatusText = require("./utils/httpStatusText");
 
 const url = process.env.MONGO_URL;
 mongoose
@@ -16,9 +17,28 @@ mongoose
   });
 
 // middleware called body parser
+app.use(cors()); //It's a browser security mechanism that controls whether a web page from one origin can access resources from another origin.
 app.use(express.json());
 const coursesRouter = require("./routes/courses.route");
 app.use("/api/courses", coursesRouter);
+
+// global  middleware for not found router
+app.all("/*splat", (req, res) => {
+  res.status(404).json({
+    status: httpStatusText.ERROR,
+    message: "This resource is not available",
+  });
+});
+// global error handler
+// error is the paremeter i sent in middleware file
+app.use((error, req, res, next) => {
+  res.status(error.statusCode || 500).json({
+    status: error.statusText || httpStatusText.ERROR,
+    message: error.message,
+    code: error.statusCode || 500,
+    data: null,
+  });
+});
 
 app.listen(process.env.PORT, () => {
   console.log("listening on port 5000");
