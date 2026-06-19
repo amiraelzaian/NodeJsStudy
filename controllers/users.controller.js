@@ -36,7 +36,7 @@ const register = asyncWrapper(async (req, res, next) => {
     );
     return next(error);
   }
-  //password hashing
+  //password hashing    take salt
   const hashedPassword = await bcrypt.hash(password, 10);
   const newUser = new User({
     firstName,
@@ -45,7 +45,7 @@ const register = asyncWrapper(async (req, res, next) => {
     password: hashedPassword,
   });
   // generate JWT token
-  // payload,secret,options like expiresIn
+  // payload
   const token = await generateJWT({ email: newUser.email, id: newUser._id });
   newUser.token = token;
   await newUser.save();
