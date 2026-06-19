@@ -16,11 +16,13 @@ mongoose
     console.error(err);
   });
 
-// middleware called body parser
 app.use(cors()); //It's a browser security mechanism that controls whether a web page from one origin can access resources from another origin.
+// middleware called body parser
 app.use(express.json());
 const coursesRouter = require("./routes/courses.route");
+const usersRouter = require("./routes/users.route");
 app.use("/api/courses", coursesRouter);
+app.use("/api/users", usersRouter);
 
 // global  middleware for not found router
 app.all("/*splat", (req, res) => {

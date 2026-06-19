@@ -3,10 +3,11 @@ const express = require("express");
 const router = express.Router();
 const coursesController = require("../controllers/courses.controller");
 const validationSchema = require("../middlewares/validationSchema");
+const verifyToken = require("../middlewares/verifyToken");
 router
   .route("/")
   .get(coursesController.getAllCourses)
-  .post(validationSchema(), coursesController.addCourse);
+  .post(verfiyToken, validationSchema(), coursesController.addCourse);
 
 router
   .route("/:courseId")

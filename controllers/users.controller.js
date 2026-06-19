@@ -1,0 +1,102 @@
+const asyncWrapper = require("../middlewares/asyncWrapper");
+const User = require("../models/user.model");
+const httpStatusText = require("../utils/httpStatusText");
+const appError = require("../utils/appError");
+const bcrypt = require("bcryptjs");
+const generateJWT = require("../utils/generateJWT");
+const getAllUsers = asyncWrapper(async (req, res) => {
+  const query = req.query;
+
+  const limit = query.limit || 10;
+  const page = query.page || 1;
+  const skip = (page - 1) * limit;
+
+  // get all courses from DB using Course Model
+  const users = await User.find({}, { __v: false, password: false })
+    .limit(limit)
+    .skip(skip);
+
+  res.json({
+    status: httpStatusText.SUCCESS,
+    data: {
+      users,
+    },
+  });
+});
+
+const register = asyncWrapper(async (req, res, next) => {
+  console.log(req.body);
+  const { firstName, lastName, email, password } = req.body;
+  const oldUser = await User.findOne({ email: email });
+  if (oldUser) {
+    const error = appError.create(
+      "Email is already used",
+      400,
+      httpStatusText.FAIL,
+    );
+    return next(error);
+  }
+  //password hashing
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const newUser = new User({
+    firstName,
+    lastName,
+    email,
+    password: hashedPassword,
+  });
+  // generate JWT token
+  // payload,secret,options like expiresIn
+  const token = await generateJWT({ email: newUser.email, id: newUser._id });
+  newUser.token = token;
+  await newUser.save();
+  res.status(201).json({
+    status: httpStatusText.SUCCESS,
+    data: { user: newUser },
+  });
+});
+
+const login = asyncWrapper(async (req, res, next) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    const error = appError.create(
+      "Email or password is empty",
+      400,
+      httpStatusText.FAIL,
+    );
+    return next(error);
+  }
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    const error = appError.create(
+      "Email or password is incorrect",
+      401,
+      httpStatusText.FAIL,
+    );
+    return next(error);
+  }
+
+  const matchedPassword = await bcrypt.compare(password, user.password);
+
+  if (matchedPassword) {
+    //logged in successfully
+    const token = await generateJWT({ email: user.email, id: user._id });
+
+    res.json({ status: httpStatusText.SUCCESS, data: { token } });
+  } else {
+    const error = appError.create(
+      "Email or password is incorrect",
+      401,
+      httpStatusText.FAIL,
+    );
+    return next(error);
+  }
+});
+
+module.exports = {
+  getAllUsers,
+  register,
+  login,
+};
