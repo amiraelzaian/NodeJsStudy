@@ -7,7 +7,7 @@ const verifyToken = require("../middlewares/verifyToken");
 router
   .route("/")
   .get(coursesController.getAllCourses)
-  .post(verfiyToken, validationSchema(), coursesController.addCourse);
+  .post(verifyToken, validationSchema(), coursesController.addCourse);
 
 router
   .route("/:courseId")
