@@ -4,15 +4,26 @@ const router = express.Router();
 const coursesController = require("../controllers/courses.controller");
 const validationSchema = require("../middlewares/validationSchema");
 const verifyToken = require("../middlewares/verifyToken");
+const userRoles = require("../utils/userRoles");
+const allowedTo = require("../middlewares/allowedTo");
 router
   .route("/")
   .get(coursesController.getAllCourses)
-  .post(verifyToken, validationSchema(), coursesController.addCourse);
+  .post(
+    verifyToken,
+    allowedTo(userRoles.MANAGER),
+    validationSchema(),
+    coursesController.addCourse,
+  );
 
 router
   .route("/:courseId")
   .get(coursesController.getCourse)
   .patch(coursesController.updateCourse)
-  .delete(coursesController.deleteCourse);
+  .delete(
+    verifyToken,
+    allowedTo(userRoles.ADMIN, userRoles.MANAGER),
+    coursesController.deleteCourse,
+  );
 
 module.exports = router;
